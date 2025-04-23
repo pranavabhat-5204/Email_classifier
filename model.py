@@ -1,3 +1,4 @@
+#I have imported the necessary libraries
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import SVC
@@ -9,9 +10,11 @@ import numpy as np
 
 
 
-
+# The CSV file is converted to a pandas dataframe and then split to training and testing data
 data=pd.read_csv('/content/combined_emails_with_natural_pii.csv')
 X_train, X_test, y_train, y_test = train_test_split(data['email'], data['type'], test_size=0.2, random_state=42)
+
+# We need encoders for both features and Labels
 from sklearn.preprocessing import LabelEncoder
 label_encoder = LabelEncoder()
 
@@ -27,19 +30,23 @@ y_test = label_encoder.fit_transform(y_test)
 y_train = torch.tensor(y_train) # y_train is a NumPy array
 y_test = torch.tensor(y_test)   # Assuming y_test is a pandas Series
 loss_fn = nn.CrossEntropyLoss()  # Example for multi-class classification
- # Example optimizer
 
+#Function for accuracy calculator
 def accuracy_fn(y_true, y_pred):
     correct = torch.eq(y_true, y_pred).sum().item()
     acc = (correct / len(y_true)) * 100
     return acc
+
+#I am trying to make a simple sequential model for this task
 model_0 = nn.Sequential(
     nn.Linear(28113, 64),   # First layer: fully connected
     nn.ReLU(),            # Activation layer
     nn.Linear(64, 10)     # Output layer
 )
 optimizer = torch.optim.Adam(model_0.parameters(), lr=0.001)
-epochs=10
+
+#Training the model
+epochs=500
 for epoch in range(epochs):
     ### Training
     model_0.train()
@@ -76,4 +83,6 @@ for epoch in range(epochs):
     # Print out what's happening every 10 epochs
     if epoch % 10 == 0:
         print(f"Epoch: {epoch} | Loss: {loss:.5f}, Accuracy: {acc:.2f}% | Test loss: {test_loss:.5f}, Test acc: {test_acc:.2f}%")
+
+#saving the model
 torch.save(model.state_dict(), 'your_model_name1.pth')
